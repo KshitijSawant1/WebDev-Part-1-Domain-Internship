@@ -62,3 +62,4 @@ Here’s how we can structure the **first 4-hour session**:
 
 💡 **Shall I update the full syllabus to include this as Session 1 and shift everything else down?**
 Do you want me to also **prepare slides / talking points / mini code snippets** for this intro session?
+
