@@ -11,5 +11,5 @@ const worksheet = workbook.Sheets[sheetName];
 // Convert sheet to JSON
 const data = XLSX.utils.sheet_to_json(worksheet);
 
-console.log("📄 Data from Excel file:");
+console.log("Data from Excel file:");
 console.log(data);

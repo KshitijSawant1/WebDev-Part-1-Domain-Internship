@@ -19,4 +19,4 @@ XLSX.utils.book_append_sheet(workbook, worksheet, "People");
 // Write to Excel file
 XLSX.writeFile(workbook, "people.xlsx");
 
-console.log("✅ Excel file 'people.xlsx' created successfully!");
+console.log("Excel file 'people.xlsx' created successfully!");
