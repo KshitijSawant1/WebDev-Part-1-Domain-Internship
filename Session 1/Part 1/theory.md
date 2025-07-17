@@ -30,7 +30,7 @@ Web development usually has two parts:
 | 4    | **Real-Time Application Friendly** | Great for apps like **chat, games, or live updates**. Supports **WebSockets**. |
 | 5    | **Perfect for Modern Web Tools** | Works with tools like **React, Angular, Vue** for project setup and building. |
 
-### 2.1 Node.js as a JavaScript Runtime Outside the Browser
+### 1.3.1 Node.js as a JavaScript Runtime Outside the Browser
 
 By default, **JavaScript runs only inside web browsers** (like Chrome, Firefox, or Edge). This means you can use it to build things like:
 
