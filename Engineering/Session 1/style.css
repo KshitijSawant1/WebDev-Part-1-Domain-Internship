@@ -1,0 +1,17 @@
+/* External CSS - style.css */
+
+.external-style {
+  color: green; /* Text color */
+  background-color: #e0ffe0; /* Light green background */
+  padding: 10px; /* Inner spacing */
+  border-radius: 5px; /* Rounded corners */
+  font-family: "Segoe UI", sans-serif;
+}
+
+h3 {
+  color:blueviolet;
+  background-color: #e0ffe0; /* Light green background */
+  padding: 10px; /* Inner spacing */
+  border-radius: 5px; /* Rounded corners */
+  font-family: "Segoe UI", sans-serif;
+}

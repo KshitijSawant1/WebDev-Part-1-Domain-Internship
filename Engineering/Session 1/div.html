@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Div Element Demo</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    .center-div {
+      width: 300px;
+      margin: auto;
+      background-color: #e8f4fd;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .multi-div {
+      margin: 20px 0;
+    }
+
+    .multi-div div {
+      margin-bottom: 10px;
+      padding: 10px;
+      background-color: #f7f7f7;
+      border: 1px solid #ccc;
+    }
+
+    .float-container {
+      width: 100%;
+      overflow: auto;
+      margin-top: 30px;
+    }
+
+    .float-container div {
+      width: 32%;
+      float: left;
+      margin-right: 2%;
+      background-color: #f1f1f1;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+
+    .inline-block-container div {
+      display: inline-block;
+      width: 30%;
+      margin-right: 2%;
+      background-color: green;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+
+    .flex-container {
+      display: flex;
+      gap: 10px;
+      margin-top: 30px;
+    }
+
+    .flex-container div {
+      flex: 1;
+      background-color: #fff7e6;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: 33% 33% 33%;
+      gap: 10px;
+      margin-top: 30px;
+    }
+
+    .grid-container div {
+      background-color: #ffe6e6;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+
+    h2 {
+      margin: 5px 0;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>The &lt;div&gt; Element Explained</h1>
+
+  <h2>Default Behavior</h2>
+  <p>Lorem Ipsum <div style="background:#ddd">I am a div</div> dolor sit amet.</p>
+
+  <h2>Centered &lt;div&gt; with <code>margin: auto</code></h2>
+  <div class="center-div">
+    <h2>London</h2>
+    <p>London is the capital city of England.</p>
+    <p>London has over 9 million inhabitants.</p>
+  </div>
+
+  <h2>Multiple &lt;div&gt; Elements</h2>
+  <div class="multi-div">
+    <div>
+      <h2>London</h2>
+      <p>Capital of England.</p>
+    </div>
+    <div>
+      <h2>Oslo</h2>
+      <p>Capital of Norway.</p>
+    </div>
+    <div>
+      <h2>Rome</h2>
+      <p>Capital of Italy.</p>
+    </div>
+  </div>
+
+  <h2>Side by Side using <code>float</code></h2>
+  <div class="float-container">
+    <div>
+      <h2>London</h2>
+      <p>Capital of England.</p>
+    </div>
+    <div>
+      <h2>Oslo</h2>
+      <p>Capital of Norway.</p>
+    </div>
+    <div style="margin-right: 0">
+      <h2>Rome</h2>
+      <p>Capital of Italy.</p>
+    </div>
+  </div>
+
+  <h2>Side by Side using <code>inline-block</code></h2>
+  <div class="inline-block-container">
+    <div>
+      <h2>London</h2>
+      <p>England</p>
+    </div>
+    <div>
+      <h2>Oslo</h2>
+      <p>Norway</p>
+    </div>
+    <div>
+      <h2>Rome</h2>
+      <p>Italy</p>
+    </div>
+  </div>
+
+  <h2>Side by Side using <code>flex</code></h2>
+  <div class="flex-container">
+    <div>
+      <h2>London</h2>
+      <p>England</p>
+    </div>
+    <div>
+      <h2>Oslo</h2>
+      <p>Norway</p>
+    </div>
+    <div>
+      <h2>Rome</h2>
+      <p>Italy</p>
+    </div>
+  </div>
+
+  <h2>Side by Side using <code>grid</code></h2>
+  <div class="grid-container">
+    <div>
+      <h2>London</h2>
+      <p>England</p>
+    </div>
+    <div>
+      <h2>Oslo</h2>
+      <p>Norway</p>
+    </div>
+    <div>
+      <h2>Rome</h2>
+      <p>Italy</p>
+    </div>
+  </div>
+</body>
+</html>

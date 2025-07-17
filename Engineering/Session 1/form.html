@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>All HTML Form Elements</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      padding: 30px;
+    }
+    h1 {
+      color: #2c3e50;
+    }
+    form {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      width: 100%;
+      max-width: 600px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      box-sizing: border-box;
+    }
+    .inline {
+      width: auto;
+      display: inline-block;
+      margin-right: 10px;
+    }
+    .form-buttons {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>HTML Form Elements Demo</h1>
+
+<form action="/submit-form">
+
+  <label for="fname">First Name</label>
+  <input type="text" id="fname" name="fname" placeholder="Enter your first name">
+
+  <label for="lname">Last Name</label>
+  <input type="text" id="lname" name="lname" placeholder="Enter your last name">
+
+  <label for="email">Email</label>
+  <input type="email" id="email" name="email" placeholder="example@example.com">
+
+  <label for="pwd">Password</label>
+  <input type="password" id="pwd" name="password">
+
+  <label>Choose Your Gender</label>
+  <input type="radio" id="male" name="gender" value="Male" class="inline">
+  <label for="male" class="inline">Male</label>
+  <input type="radio" id="female" name="gender" value="Female" class="inline">
+  <label for="female" class="inline">Female</label>
+
+  <label>Select Your Hobbies</label>
+  <input type="checkbox" id="bike" name="hobby" value="Bike" class="inline">
+  <label for="bike" class="inline">Biking</label>
+  <input type="checkbox" id="music" name="hobby" value="Music" class="inline">
+  <label for="music" class="inline">Music</label>
+  <input type="checkbox" id="travel" name="hobby" value="Travel" class="inline">
+  <label for="travel" class="inline">Travel</label>
+
+  <label for="country">Country</label>
+  <select id="country" name="country">
+    <option value="India">India</option>
+    <option value="USA">USA</option>
+    <option value="UK">UK</option>
+  </select>
+
+  <label for="dob">Date of Birth</label>
+  <input type="date" id="dob" name="dob">
+
+  <label for="color">Choose Favorite Color</label>
+  <input type="color" id="color" name="color">
+
+  <label for="file">Upload Profile Picture</label>
+  <input type="file" id="file" name="file">
+
+  <label for="bio">Short Bio</label>
+  <textarea id="bio" name="bio" rows="4" placeholder="Tell us about yourself..."></textarea>
+
+  <label for="search">Search Term</label>
+  <input type="search" id="search" name="search">
+
+  <label for="url">Your Website</label>
+  <input type="url" id="url" name="url" placeholder="https://example.com">
+
+  <label for="phone">Phone Number</label>
+  <input type="tel" id="phone" name="phone" placeholder="123-456-7890">
+
+  <label for="range">Rate Us (1 to 10)</label>
+  <input type="range" id="range" name="rating" min="1" max="10">
+
+  <div class="form-buttons">
+    <input type="submit" value="Submit">
+    <input type="reset" value="Reset">
+  </div>
+
+</form>
+
+</body>
+</html>
