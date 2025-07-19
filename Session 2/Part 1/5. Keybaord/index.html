@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Keyboard Events</title>
+  </head>
+  <body>
+    <h2>Press Any Key Inside the Input Box</h2>
+    <input type="text" id="keyInput" placeholder="Type something..." />
+
+    <p id="keyDisplay"></p>
+
+    <script>
+      const input = document.getElementById("keyInput");
+      const display = document.getElementById("keyDisplay");
+
+      input.addEventListener("keydown", (e) => {
+        display.textContent = `Key Down: ${e.key}`;
+      });
+
+      input.addEventListener("keyup", (e) => {
+        display.textContent = `Key Up: ${e.key}`;
+      });
+    </script>
+  </body>
+</html>

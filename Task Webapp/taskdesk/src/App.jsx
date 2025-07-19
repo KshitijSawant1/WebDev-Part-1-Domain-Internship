@@ -1,10 +1,12 @@
+// src/App.jsx
 import React from "react";
-import Landing from "./components/Landing";
-import LandingPro from "./components/LandingPro";
+import { RouterProvider } from "react-router-dom";
+import router from "./components/Router"; 
+
 const App = () => {
   return (
-    <div>
-      <LandingPro />
+    <div className="font-sans">
+      <RouterProvider router={router} />
     </div>
   );
 };

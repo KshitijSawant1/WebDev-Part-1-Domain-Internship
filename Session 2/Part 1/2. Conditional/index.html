@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Conditionals</title>
+  </head>
+  <body>
+    <h2>Check Console for Result</h2>
+
+    <script>
+      let marks = 85;
+
+      // if-else
+      if (marks >= 90) {
+        console.log("Grade: A+");
+      } else if (marks >= 75) {
+        console.log("Grade: A");
+      } else {
+        console.log("Grade: B or below");
+      }
+
+      // switch
+      let day = "Tuesday";
+      switch (day) {
+        case "Monday":
+          console.log("Start of week!");
+          break;
+        case "Friday":
+          console.log("Weekend soon!");
+          break;
+        default:
+          console.log("Just another day: " + day);
+      }
+    </script>
+  </body>
+</html>

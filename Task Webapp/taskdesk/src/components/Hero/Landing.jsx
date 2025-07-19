@@ -1,5 +1,4 @@
 import React from "react";
-import Flower from "./Flower";
 
 const pfp2 =
   "https://i.pinimg.com/1200x/34/99/79/349979fbe5cd52d72f42a89561cdaed4.jpg";
