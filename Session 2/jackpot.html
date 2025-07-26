@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Jackpot</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f5f5f5;
+        text-align: center;
+        padding: 20px;
+      }
+
+      h1 {
+        color: #222;
+      }
+
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(10, 1fr);
+        max-width: 850px;
+        margin: 30px auto;
+        gap: 12px;
+        padding: 20px;
+        background: #ffffff;
+        border-radius: 14px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        border: 2px solid #e0e0e0;
+      }
+
+      .number {
+        background: white;
+        border: 2px solid #ccc;
+        border-radius: 10px;
+        aspect-ratio: 1 / 1;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 22px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        transition: all 0.2s ease;
+        user-select: none;
+      }
+
+      .number:hover {
+        background-color: #eee;
+        cursor: crosshair;
+        transform: scale(1.05);
+      }
+
+      .red {
+        background-color: #ff4d4d;
+        color: white;
+        pointer-events: none;
+      }
+
+      .green {
+        background-color: #4caf50 !important;
+        color: white;
+        pointer-events: none;
+      }
+
+      .last-guess {
+        background-color: #ffffff !important;
+        border: 3px dashed #333 !important;
+        color: #000 !important;
+      }
+
+      #message {
+        margin-top: 20px;
+        font-weight: bold;
+        font-size: 20px;
+      }
+
+      #attempts-left {
+        margin-top: 10px;
+        color: #666;
+        font-size: 16px;
+      }
+
+      #restartBtn {
+        margin-top: 20px;
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #2196f3;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        display: none;
+      }
+
+      #restartBtn:hover {
+        background-color: #1976d2;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Jackpot Number Game</h1>
+    <p>Click a number to guess the jackpot between 1 and 100!</p>
+
+    <div class="grid" id="grid"></div>
+
+    <div id="message">Game Started! Make your first guess.</div>
+    <div id="attempts-left">Attempts Left: 10</div>
+    <button id="restartBtn" onclick="restartGame()">Play Again</button>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+      const grid = document.getElementById("grid");
+      const message = document.getElementById("message");
+      const attemptsLeft = document.getElementById("attempts-left");
+      const restartBtn = document.getElementById("restartBtn");
+
+      let jackpot;
+      let attempts;
+      const maxAttempts = 10;
+
+      function startGame() {
+        grid.innerHTML = "";
+        jackpot = Math.floor(Math.random() * 100) + 1;
+        attempts = 0;
+        message.textContent = "Game Started! Make your first guess.";
+        attemptsLeft.textContent = `Attempts Left: ${maxAttempts}`;
+        restartBtn.style.display = "none";
+
+        for (let i = 1; i <= 100; i++) {
+          const number = document.createElement("div");
+          number.className = "number";
+          number.textContent = i;
+          number.dataset.value = i;
+          grid.appendChild(number);
+        }
+      }
+
+      function markDisqualified(guess) {
+        const numbers = document.querySelectorAll(".number");
+        numbers.forEach((num) => {
+          const value = parseInt(num.dataset.value);
+          if (
+            (guess > jackpot && value >= guess) ||
+            (guess < jackpot && value <= guess)
+          ) {
+            num.classList.add("red");
+            num.style.pointerEvents = "none";
+          }
+        });
+      }
+
+      function disableAll() {
+        document.querySelectorAll(".number").forEach((num) => {
+          num.style.pointerEvents = "none";
+        });
+      }
+
+      function restartGame() {
+        startGame();
+      }
+
+      grid.addEventListener("click", (e) => {
+        const target = e.target;
+        if (!target.classList.contains("number")) return;
+
+        // Remove last guess
+        document.querySelectorAll(".number").forEach((num) => {
+          num.classList.remove("last-guess");
+        });
+        target.classList.add("last-guess");
+
+        const guess = parseInt(target.dataset.value);
+        attempts++;
+
+        if (guess === jackpot) {
+          target.classList.remove("last-guess");
+          target.classList.add("green");
+          message.textContent = `🎉 Correct! ${guess} is the jackpot!`;
+          confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+          disableAll();
+          restartBtn.style.display = "inline-block";
+        } else {
+          markDisqualified(guess);
+          message.textContent =
+            guess > jackpot
+              ? `❌ ${guess} is too high. Try a smaller number.`
+              : `❌ ${guess} is too low. Try a larger number.`;
+
+          if (attempts === maxAttempts) {
+            message.textContent = `💀 Game Over! The jackpot was ${jackpot}`;
+            const winNum = document.querySelector(
+              `.number[data-value="${jackpot}"]`
+            );
+            winNum.classList.add("green");
+            disableAll();
+            restartBtn.style.display = "inline-block";
+          }
+        }
+
+        attemptsLeft.textContent = `Attempts Left: ${maxAttempts - attempts}`;
+      });
+
+      startGame();
+    </script>
+  </body>
+</html>

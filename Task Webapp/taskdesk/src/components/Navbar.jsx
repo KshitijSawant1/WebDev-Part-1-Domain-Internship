@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import TDLogo from "../assets/logo/TDLogo2.png";
+import TDLogo from "../assets/logo/TDLogo1.png";
 
 const Navbar = () => {
   return (

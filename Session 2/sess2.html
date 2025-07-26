@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<head>
+    <title>
+        session 2
+    </title>
+    <style>
+        .box1{
+            background-color: aquamarine;
+            height: 100px;
+            width :100px;
+            margin: 2px;
+        }
+        .box2{
+            background-color: blue;
+            height: 100px;
+            width :100px;
+            margin: 2px;
+        }
+        .box3{
+            background-color: blue;
+            height: 100px;
+            width :100px;
+            margin: 2px;
+        }
+    </style>
+    <body>
+        <button
+        onclick="showalert()">
+            Click ME for alert
+        </button>
+<hr>
+    <h2>Sqaure a number</h2>
+    <label for="">Enter a number</label>
+    <input type="number" name="" id="sqrip" placeholder="Number"/>
+    <button onclick="numsqr()">Sqaure it </button>
+    <div id="sqrop"></div>
+    <div>
+      <div id="box1" class="box1">Box 1<button onclick="change_bg_once()">test</button></div>
+      <div id="box2" class="box2">Box 2<button onclick="change_bg_switch()">test</button></div>
+      <div id="box3" class="box3">Box 3<button onclick="change_random()">test</button></div>
+    </div>
+    <hr>
+    </body>
+    <script>
+        function showalert(){
+            alert("Hello")
+        }
+
+        function numsqr(){
+            num = document.getElementById("sqrip").value;
+            res = num*num
+            document.getElementById("sqrop").innerText=res
+        }
+
+        function change_bg_once(){
+            document.getElementById("box1").style.backgroundColor="red"
+        }
+
+        isBlue=false
+        function change_bg_switch(){
+            const box = document.getElementById("box2")
+            box.style.backgroundColor=isBlue?"red":"blue";
+            isBlue=!isBlue
+        }
+
+        function change_random(){
+            random=`#`+Math.floor(Math.random()*16777215).toString(16);
+            document.getElementById("box3").style.backgroundColor=random;
+        }
+    </script>
+</head>
+</html>

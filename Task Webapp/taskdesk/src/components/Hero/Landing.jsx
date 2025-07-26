@@ -9,7 +9,8 @@ const pfp3 =
 
 const Landing = () => {
   return (
-    <div className="bg-[#fefee3] dark:bg-[#4c956c] pb-10">
+    <div className="bg-[#fefee3] dark:bg-[#4c956c] pb-10 ">
+      
       {/* Hero Section */}
       <section className="relative bg-[#fefee3] dark:bg-[#4c956c] mb-10 bg-[url('https://flowbite.s3.amazonaws.com/docs/jumbotron/hero-pattern.svg')] dark:bg-[url('https://flowbite.s3.amazonaws.com/docs/jumbotron/hero-pattern-dark.svg')]">
         <div className="relative z-10 px-4 py-12 mx-auto max-w-7xl text-center sm:px-6 lg:px-8 lg:py-20">

@@ -1,5 +1,5 @@
 import React from "react";
-import pattern from "../../assets/patterns/G4.png";
+import pattern from "../../assets/patterns/G2.png";
 
 const LandingBasic = () => {
   const handleScroll = () => {
@@ -8,7 +8,7 @@ const LandingBasic = () => {
   };
 
   return (
-    <div className="relative min-h-screen w-full bg-[#E8FCCF] overflow-hidden">
+    <div className="relative min-h-screen w-full bg-white overflow-hidden pt-12">
       {/* Background Pattern */}
       <div
         className="absolute inset-0 bg-cover bg-center opacity-10 z-0"
@@ -17,7 +17,7 @@ const LandingBasic = () => {
 
       {/* Hero Section */}
       <section className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 text-center mb-4 mt-10">
-        <p className="text-sm text-[#134611] bg-[#96E072] px-4 py-1 rounded-full  font-medium">
+        <p className="text-sm text-blue-500 bg-blue-200 px-4 py-1 rounded-full  font-medium">
           New Feature Launched!
         </p>
         <div className="flex justify-center gap-2 flex-wrap mt-6">
@@ -25,8 +25,8 @@ const LandingBasic = () => {
             <div
               key={index}
               className="w-14 h-14 md:w-16 md:h-16 flex items-center justify-center 
-                 bg-[#134611] text-white font-bold text-2xl rounded-md shadow-lg 
-                 transition-all duration-300 ease-in hover:scale-110 hover:bg-[#96E072] hover:duration-500 hover:ease-out"
+                 bg-blue-900 text-blue-100 font-bold text-2xl rounded-md shadow-lg 
+                 transition-all duration-300 ease-in hover:scale-110 hover:bg-blue-200 hover:text-blue-500 hover:duration-500 hover:ease-out"
             >
               {char}
             </div>
@@ -37,7 +37,10 @@ const LandingBasic = () => {
         <section className="w-full max-w-6xl mx-auto overflow-hidden rounded-lg sm:grid sm:grid-cols-2 sm:items-center">
           <div className="p-8 md:p-12 lg:px-16 lg:py-24">
             <div className="text-center sm:text-left">
-              <h2 className="text-3xl font-bold text-gray-900 md:text-3xl"style={{ fontFamily: "cursive" }}>
+              <h2
+                className="text-3xl font-bold text-gray-900 md:text-3xl"
+                style={{ fontFamily: "cursive" }}
+              >
                 Focus. Plan. Complete.
               </h2>
 
@@ -50,7 +53,7 @@ const LandingBasic = () => {
               <div className="mt-4 md:mt-8">
                 <a
                   href="#"
-                  className="inline-block rounded bg-emerald-600 px-8 py-3 text-sm font-medium text-white hover:bg-emerald-700 transition"
+                  className="inline-block rounded bg-blue-600 px-8 py-3 text-sm font-medium text-white hover:bg-blue-700 transition"
                 >
                   Get Started Today
                 </a>
@@ -65,9 +68,9 @@ const LandingBasic = () => {
           />
           {/* About the Maker Section */}
         </section>
-        <section className="bg-green-50 py-16 px-4 text-center border-3 border-green-900 rounded-xl shadow-md">
+        <section className="bg-blue-50 py-16 px-4 text-center border-3 border-blue-900 rounded-xl shadow-md">
           <div className="max-w-3xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-green-900 mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold text-blue-900 mb-4">
               About the Maker
             </h2>
             <p className="text-gray-700 mb-6 text-lg leading-relaxed">
@@ -82,7 +85,7 @@ const LandingBasic = () => {
                 href="https://github.com/KshitijSawant1"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 border border-green-800 text-green-800 px-4 py-2 rounded-full hover:bg-green-800 hover:text-white transition"
+                className="flex items-center gap-2 border border-blue-800 text-blue-800 px-4 py-2 rounded-full hover:bg-blue-800 hover:text-white transition"
               >
                 <svg
                   className="w-5 h-5"
@@ -98,7 +101,7 @@ const LandingBasic = () => {
                 href="https://www.linkedin.com/in/kshitijksawant/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 border border-green-800 text-green-800 px-4 py-2 rounded-full hover:bg-green-800 hover:text-white transition"
+                className="flex items-center gap-2 border border-blue-800 text-blue-800 px-4 py-2 rounded-full hover:bg-blue-800 hover:text-white transition"
               >
                 <svg
                   className="w-5 h-5"

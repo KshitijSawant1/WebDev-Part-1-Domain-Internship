@@ -5,9 +5,9 @@ import Layout from "./Layout";
 
 import Landing from "./Hero/LandingBasic";
 import Dashboard from "./main/Dashboard";
-import Playground from "./main/Playground";
-import Signin from "./Signin";
-import Signup from "./Signup";
+import Playground from "./main/PlaygroundX";
+import Signin from "./SigninX";
+import Signup from "./SignupX";
 import NotFound from "./NotFound";
 
 const router = createBrowserRouter([
