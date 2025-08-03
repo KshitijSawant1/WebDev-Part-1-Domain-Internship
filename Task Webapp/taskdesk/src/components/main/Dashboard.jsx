@@ -14,12 +14,58 @@ import TaskHeatmap from "../Charts/TaskHeatmap";
 import AreaChartComponent from "../Charts/AreaChartComponent";
 import WeeklyPriorityAreaChart from "../Charts/WeeklyPriorityAreaChart";
 import PriorityRadarChart from "../Charts/PriorityRadarChart";
+import ProgressGaugeChart from "../Charts/ProgressGaugeChart";
 
 const Dashboard = () => {
+  const statCards = [
+    {
+      icon: FiClipboard,
+      label: "Total Tasks",
+      value: "42",
+      borderColor: "border-green-600",
+      textColor: "text-green-600",
+    },
+    {
+      icon: FiArrowUpCircle,
+      label: "Urgent & Important",
+      value: "5",
+      borderColor: "border-red-500",
+      textColor: "text-red-500",
+    },
+    {
+      icon: FiClock,
+      label: "Avg. Completion Time",
+      value: "2d 6h",
+      borderColor: "border-yellow-400",
+      textColor: "text-yellow-400",
+    },
+    {
+      icon: FiRefreshCw,
+      label: "Longest Active Task",
+      value: "12d 3h",
+      borderColor: "border-blue-500",
+      textColor: "text-blue-500",
+    },
+    {
+      icon: FiAlertTriangle,
+      label: "Overdue Tasks",
+      value: "3",
+      borderColor: "border-orange-500",
+      textColor: "text-orange-500",
+    },
+    {
+      icon: FiArrowUpCircle,
+      label: "Critical Tasks",
+      value: "2",
+      borderColor: "border-rose-500",
+      textColor: "text-rose-500",
+    },
+  ];
+
   return (
-    <div className="h-screen w-screen flex mt-18 bg-gray-100 overflow-hidden">
+    <div className="flex w-full h-full overflow-hidden mt-18">
       {/* Sidebar */}
-      <div className="w-1/4 min-w-[260px] bg-white shadow-inner flex flex-col p-4 gap-4 overflow-hidden">
+      <div className="w-full sm:w-1/4 min-w-[260px] max-w-xs bg-white shadow-inner flex flex-col p-4 gap-4 overflow-hidden">
         {/* Profile Image */}
         <div className="flex flex-col items-center space-y-2">
           <img
@@ -57,66 +103,45 @@ const Dashboard = () => {
         {/* Sign Out */}
         <button
           onClick={() => alert("Signing out...")}
-          className="mt-2 w-full py-1 bg-red-600 text-white text-xs rounded-md hover:bg-red-700 transition font-semibold"
+          className="w-full py-1 bg-red-600 text-white text-xs rounded-md hover:bg-red-700 transition font-semibold"
         >
           Sign Out
         </button>
 
-        {/* Mini Charts */}
-        <div className="flex-1 flex flex-col gap-4 overflow-hidden">
-          <div className="w-full aspect-square bg-gray-50 rounded shadow flex items-center justify-center">
-            <PriorityRadarChart />
-          </div>
+        {/* Vertical Responsive Chart */}
+        <div className="flex-1 min-h-0">
+          <PieChartComponent />
+        </div>
+        {/* Stat Cards + Chart */}
+        <div className="flex-1 flex flex-col gap-3 overflow-hidden">
+          {/* Last 2 Stat Cards */}
+          {statCards.slice(-2).map((card, i) => (
+            <div
+              key={i}
+              className={`w-full rounded bg-white ${card.borderColor} border-l-4 shadow flex border border-2px border-color -${card.borderColor} items-center gap-3 p-3`}
+            >
+              <card.icon className={`text-xl ${card.textColor}`} />
+              <div>
+                <p className="text-xs text-gray-500">{card.label}</p>
+                <h2 className="text-base font-bold text-gray-800">
+                  {card.value}
+                </h2>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
       {/* Main Dashboard */}
-      <div className="flex-1 flex flex-col p-4 gap-4 overflow-hidden">
+      <div className="flex-1 flex flex-col p-4 gap-4 overflow-hidden mb-4">
         {/* Stat Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 flex-none">
-          {[
-            {
-              icon: FiClipboard,
-              label: "Total Tasks",
-              value: "42",
-              color: "green-600",
-            },
-            {
-              icon: FiArrowUpCircle,
-              label: "Urgent & Important",
-              value: "5",
-              color: "red-500",
-            },
-            {
-              icon: FiClock,
-              label: "Avg. Completion Time",
-              value: "2d 6h",
-              color: "yellow-400",
-            },
-            {
-              icon: FiRefreshCw,
-              label: "Longest Active Task",
-              value: "12d 3h",
-              color: "blue-500",
-            },
-            {
-              icon: FiAlertTriangle,
-              label: "Overdue Tasks",
-              value: "3",
-              color: "orange-500",
-            },
-            {
-              icon: FiArrowUpCircle,
-              label: "Critical Tasks",
-              value: "2",
-              color: "rose-500",
-            },
-          ].map((card, i) => (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          {statCards.slice(0, -2).map((card, i) => (
             <div
               key={i}
-              className={`rounded bg-white border-l-4 border-${card.color} shadow flex items-center gap-3 p-3`}
+              className={`rounded bg-white ${card.borderColor} border-l-4 shadow flex border border-2px border-color -${card.borderColor} items-center gap-3 p-3`}
             >
-              <card.icon className={`text-2xl text-${card.color}`} />
+              <card.icon className={`text-2xl ${card.textColor}`} />
               <div>
                 <p className="text-xs text-gray-500">{card.label}</p>
                 <h2 className="text-lg font-bold text-gray-800">
@@ -127,21 +152,24 @@ const Dashboard = () => {
           ))}
         </div>
 
-        {/* Charts */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 flex-[1.2] overflow-hidden">
-          <div className="bg-white rounded shadow p-2 aspect-square flex items-center justify-center">
-            <PieChartComponent />
+        {/* Charts Row */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="bg-transparent rounded shadow  aspect-square flex items-center justify-center">
+            <PriorityRadarChart />
           </div>
-          <div className="bg-white rounded shadow p-2 aspect-square">
+          <div className="bg-transparent rounded  aspect-square">
             <BarChartComponent />
           </div>
-          <div className="bg-white rounded shadow p-2 aspect-square">
+          <div className="bg-transparent rounded shadowaspect-square">
             <RadialBarChartComponent />
           </div>
         </div>
 
-        <div className="aspect-[3/1] w-full max-w-full">
-          <AreaChartComponent />
+        {/* Weekly Priority Chart - Responsive and adaptive height */}
+        <div className="w-full bg-white shadow rounded ">
+          <div className="w-full h-[260px] sm:h-[300px] md:h-[340px] lg:h-[380px]">
+            <WeeklyPriorityAreaChart />
+          </div>
         </div>
       </div>
     </div>

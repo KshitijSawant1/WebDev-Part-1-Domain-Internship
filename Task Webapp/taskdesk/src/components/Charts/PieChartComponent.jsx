@@ -11,7 +11,7 @@ const COLORS = ["#4ade80", "#facc15", "#f87171"]; // green, yellow, red
 
 const PieChartComponent = () => {
   return (
-    <div className="w-full h-full bg-white pt-4 rounded shadow flex flex-col items-center justify-center">
+    <div className="w-full h-full bg-white pt-4 rounded flex flex-col items-center justify-center">
       <h2 className="text-lg font-bold text-center mb-2">Task Status</h2>
       <div className="w-full h-60">
         <ResponsiveContainer width="100%" height="100%">

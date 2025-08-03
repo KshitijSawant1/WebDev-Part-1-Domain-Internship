@@ -9,7 +9,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-// Sample weekly data
+// Weekly priority data
 const data = [
   {
     day: "Mon",
@@ -64,11 +64,11 @@ const data = [
 
 const WeeklyPriorityAreaChart = () => {
   return (
-    <div className="w-full h-full p-4 bg-white rounded shadow flex flex-col">
-      <h2 className="text-center text-base font-semibold mb-2">
+    <div className="w-full h-[80%] min-h-[80%] max-h-[80%] p-4 bg-white rounded shadow flex flex-col">
+      <h2 className="text-center text-base font-semibold mb-3">
         Weekly Task Priorities
       </h2>
-      <div className="flex-1 w-full">
+      <div className="flex-1">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart
             data={data}
@@ -76,7 +76,7 @@ const WeeklyPriorityAreaChart = () => {
           >
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="day" />
-            <YAxis />
+            <YAxis allowDecimals={false} />
             <Tooltip />
             <Area
               type="monotone"
