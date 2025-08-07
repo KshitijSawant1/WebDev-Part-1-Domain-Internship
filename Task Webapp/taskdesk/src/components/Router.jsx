@@ -3,7 +3,7 @@ import React from "react";
 import { createBrowserRouter } from "react-router-dom";
 import Layout from "./Layout";
 
-import Landing from "./Hero/LandingBasic";
+import Landing from "./Hero/LandingPro";
 import Dashboard from "./main/Dashboard";
 import Playground from "./main/PlaygroundX";
 import Signin from "./SigninX";
