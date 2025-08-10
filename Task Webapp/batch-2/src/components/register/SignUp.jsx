@@ -1,6 +1,33 @@
 import React from "react";
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { UserAuth } from "../../context/AuthContext";
 
 const Signup = () => {
+  const { signUpNewUser } = UserAuth();
+  const navigate = useNavigate();
+
+  // useSate of the Features
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  //Handle Sign Up New User
+  const handleSignUp = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const result = await signUpNewUser(email, password);
+      if (result.success) {
+        navigate("/dashboard");
+      }
+    } catch (error) {
+      setError("An Error Occured in Handle Sign Up User");
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div>
       <div className="min-h-screen flex items-center justify-center bg-white px-4 py-12">
@@ -22,13 +49,15 @@ const Signup = () => {
               Join TaskDesk and boost your productivity
             </p>
 
-            <form className="space-y-4">
+            <form onSubmit={handleSignUp} className="space-y-4">
               <input
+                onChange={(e) => setEmail(e.target.value)}
                 type="email"
                 placeholder="Email"
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
               />
               <input
+                onChange={(e) => setPassword(e.target.value)}
                 type="password"
                 placeholder="Password"
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -39,6 +68,15 @@ const Signup = () => {
               >
                 Sign Up
               </button>
+              {error && (
+                <p
+                  className="text-center text-sm font-medium text-red-700 
+                bg-red-100 border border-red-300 rounded-md px-4 py-3 
+                shadow-md"
+                >
+                  {error}
+                </p>
+              )}
             </form>
 
             <p className="text-sm text-center text-gray-600 mt-4">

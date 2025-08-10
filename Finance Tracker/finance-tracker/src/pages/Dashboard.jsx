@@ -1,35 +1,44 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
 import { getTransactions } from "../utils/localStorageUtils";
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const initialBalanceSetRef = useRef(false);
-  const [transactions, setTransactions] = useState([]);
 
+  const [transactions, setTransactions] = useState([]);
+  const [initialBalance, setInitialBalance] = useState(0);
+  const [justSetInitial, setJustSetInitial] = useState(false);
+
+  // Ask initial balance if missing, then load transactions
   useEffect(() => {
     const storedInitial = localStorage.getItem("initialBalance");
-    const storedTransactions = getTransactions();
 
     if (!storedInitial) {
       const input = prompt(
         "Welcome to FinTrack! Please enter your initial balance (₹):"
       );
       if (input && !isNaN(input)) {
-        localStorage.setItem("initialBalance", parseFloat(input));
-        initialBalanceSetRef.current = true; // mark that balance was just set
+        const val = parseFloat(input);
+        localStorage.setItem("initialBalance", val);
+        setInitialBalance(val);
+        setJustSetInitial(true);
       } else {
         alert("Invalid amount. You can add your balance later.");
+        setInitialBalance(0);
       }
+    } else {
+      setInitialBalance(parseFloat(storedInitial));
     }
 
-    setTransactions(storedTransactions);
+    setTransactions(getTransactions());
   }, []);
 
-  const initialBalance = parseFloat(
-    localStorage.getItem("initialBalance") || 0
-  );
+  // Redirect after 10s only if balance was just set now
+  useEffect(() => {
+    if (!justSetInitial) return;
+    const t = setTimeout(() => navigate("/history"), 10000);
+    return () => clearTimeout(t);
+  }, [justSetInitial, navigate]);
 
   const totalIncome = transactions
     .filter((t) => t.type === "income")
@@ -41,29 +50,9 @@ const Dashboard = () => {
 
   const balance = initialBalance + totalIncome - totalExpense;
 
-  // Sort transactions by most recent
   const recentTransactions = [...transactions]
     .sort((a, b) => new Date(b.date) - new Date(a.date))
     .slice(0, 3);
-
-  useEffect(() => {
-    const storedInitial = localStorage.getItem("initialBalance");
-    const storedTransactions = getTransactions();
-
-    if (!storedInitial) {
-      const input = prompt(
-        "Welcome to FinTrack! Please enter your initial balance (₹):"
-      );
-      if (input && !isNaN(input)) {
-        localStorage.setItem("initialBalance", parseFloat(input));
-        initialBalanceSetRef.current = true; // mark that balance was just set
-      } else {
-        alert("Invalid amount. You can add your balance later.");
-      }
-    }
-
-    setTransactions(storedTransactions);
-  }, []);
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
@@ -73,23 +62,18 @@ const Dashboard = () => {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
-        {/* Total Balance */}
         <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
           <h3 className="text-sm text-gray-500">Total Balance</h3>
           <p className="text-2xl font-bold text-blue-700 mt-2">
             ₹{balance.toFixed(2)}
           </p>
         </div>
-
-        {/* Total Income */}
         <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
           <h3 className="text-sm text-gray-500">Total Income</h3>
           <p className="text-2xl font-bold text-green-700 mt-2">
             ₹{totalIncome.toFixed(2)}
           </p>
         </div>
-
-        {/* Total Expense */}
         <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-red-500">
           <h3 className="text-sm text-gray-500">Total Expense</h3>
           <p className="text-2xl font-bold text-red-600 mt-2">
@@ -103,7 +87,6 @@ const Dashboard = () => {
         <h4 className="text-lg font-semibold text-gray-700 mb-4">
           Recent Transactions
         </h4>
-
         <ul className="divide-y divide-gray-200">
           {recentTransactions.length === 0 ? (
             <li className="py-4 text-center text-gray-600">

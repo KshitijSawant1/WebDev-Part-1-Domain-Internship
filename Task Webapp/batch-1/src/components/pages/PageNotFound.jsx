@@ -6,7 +6,7 @@ const PageNotFound = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 px-6 text-center">
       <FaExclamationTriangle className="text-red-500 text-6xl mb-4" />
-      <h1 clasgsName="text-4xl font-bold text-gray-800 mb-2">
+      <h1 className="text-4xl font-bold text-gray-800 mb-2">
         404 - Page Not Found
       </h1>
       <p className="text-gray-600 mb-6 max-w-md">
