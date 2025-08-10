@@ -1,6 +1,40 @@
 import React from "react";
-import {Link} from 'react-router-dom'
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { UserAuth } from "../../context/AuthContext";
+
 const Signup = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+
+  const { session, signupNewUser } = UserAuth();
+  // Do before Setting handle SignUp
+  // console.log(session);
+  // console.log(email,password);
+
+  const handleSignUp = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const result = await signupNewUser(email, password);
+      if (result.success) {
+        setError(
+          "A confirmation email has been sent to your inbox. Please verify your email before signing in."
+        );
+        // navigate("/dashboard");
+      }
+    } catch (error) {
+      setError("An Error Occured in handle Sign Up User");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // After Handle Sign Up Go to form and onSubmit attribute
+
   return (
     <div>
       <div className="min-h-screen flex items-center justify-center bg-white px-4 py-12">
@@ -13,24 +47,36 @@ const Signup = () => {
             <p className="text-sm text-gray-600 mb-6 text-center">
               Join TaskDesk and boost your productivity
             </p>
-
-            <form className="space-y-4">
+            {/*handle submit here */}
+            <form onSubmit={handleSignUp} className="space-y-4">
+              {/*onChange set Email here */}
               <input
+                onChange={(e) => setEmail(e.target.value)}
                 type="email"
                 placeholder="Email"
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
               />
+
+              {/*onChange set password here */}
               <input
+                onChange={(e) => setPassword(e.target.value)}
                 type="password"
                 placeholder="Password"
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
               />
               <button
                 type="submit"
+                disabled={loading}
                 className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition"
               >
                 Sign Up
               </button>
+              {/*Place to show error here if exist*/}
+              {error && (
+                <p className="text-center text-sm font-medium text-red-700 bg-red-100 border border-red-300 rounded-md px-4 py-3 shadow-sm">
+                  {error}
+                </p>
+              )}
             </form>
 
             <p className="text-sm text-center text-gray-600 mt-4">
