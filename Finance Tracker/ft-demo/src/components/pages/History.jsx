@@ -1,24 +1,21 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import AddTransactionModal from "../modal/AddTransactionalModal";
+import {
+  getTransactions,
+  deleteTransaction,
+} from "../../utils/localStorageUtils";
 
 const History = () => {
-  // Dummy static transactions for UI display
-  const transactions = [
-    {
-      id: 1,
-      date: "2025-08-01",
-      description: "Salary",
-      type: "income",
-      amount: 15000,
-    },
-    {
-      id: 2,
-      date: "2025-08-03",
-      description: "Groceries",
-      type: "expense",
-      amount: 1200,
-    },
-  ];
+  const [showModal, setShowModal] = useState(false);
+  const [transactions, setTransactions] = useState([]);
+  useEffect(() => {
+    setTransactions(getTransactions());
+  }, [setShowModal]);
 
+  const handleDelete = (id) => {
+    deleteTransaction(id);
+    setTransactions(getTransactions());
+  };
   return (
     <div className="relative p-4 sm:p-6 max-w-5xl mx-auto">
       <h2 className="text-2xl sm:text-3xl font-bold text-blue-700 mb-4 sm:mb-6 text-center">
@@ -63,7 +60,7 @@ const History = () => {
                   <td className="py-2 px-2 text-center">
                     <button
                       className="text-red-500 hover:text-red-700 text-xs"
-                      onClick={() => alert(`Delete transaction ${t.id}`)}
+                      onClick={() => handleDelete(t.id)}
                     >
                       Delete
                     </button>
@@ -77,12 +74,14 @@ const History = () => {
 
       {/* Floating Add Button */}
       <button
-        onClick={() => alert("Open Add Transaction Modal")}
+        onClick={() => setShowModal(true)}
         className="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 bg-blue-600 text-white rounded-full p-4 shadow-lg hover:bg-blue-700 transition text-3xl sm:text-2xl"
         aria-label="Add Transaction"
       >
         +
       </button>
+
+      {showModal && <AddTransactionModal onClose={() => setShowModal(false)} />}
     </div>
   );
 };

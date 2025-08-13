@@ -1,110 +1,130 @@
-import React, { useState } from "react";
-import { FaPlus, FaTrashAlt } from "react-icons/fa";
-
-const initialSpaces = [
-  {
-    id: 1,
-    title: "My Notes",
-    type: "Private",
-    description: "Personal to-dos",
-    labels: ["Frontend", "Urgent"],
-    priority: "Priority & Important",
-    startDate: "2025-08-01T10:00",
-    endDate: "2025-08-07T18:00",
-    progress: 60,
-  },
-  {
-    id: 2,
-    title: "Team Sprint",
-    type: "Shared",
-    description: "Sprint planning board",
-    labels: ["React", "Backend"],
-    priority: "Not Priority & Important",
-    startDate: "2025-08-02T08:00",
-    endDate: "2025-08-10T17:00",
-    progress: 80,
-  },
-  {
-    id: 3,
-    title: "Ideas",
-    type: "Private",
-    description: "Brainstorming scraps",
-    labels: ["Innovation"],
-    priority: "Priority & Not Important",
-    startDate: "2025-08-03T09:00",
-    endDate: "2025-08-15T16:00",
-    progress: 30,
-  },
-  {
-    id: 4,
-    title: "Ideas",
-    type: "Private",
-    description: "Brainstorming scraps",
-    labels: ["Innovation"],
-    priority: "Priority & Not Important",
-    startDate: "2025-08-03T09:00",
-    endDate: "2025-08-15T16:00",
-    progress: 30,
-  },
-  {
-    id: 5,
-    title: "Ideas",
-    type: "Private",
-    description: "Brainstorming scraps",
-    labels: ["Innovation"],
-    priority: "Priority & Not Important",
-    startDate: "2025-08-03T09:00",
-    endDate: "2025-08-15T16:00",
-    progress: 30,
-  },
-  {
-    id: 6,
-    title: "Ideas",
-    type: "Private",
-    description: "Brainstorming scraps",
-    labels: ["Innovation"],
-    priority: "Priority & Not Important",
-    startDate: "2025-08-03T09:00",
-    endDate: "2025-08-15T16:00",
-    progress: 30,
-  },
-];
+// src/pages/Playground.jsx
+import React, { useEffect, useMemo, useState } from "react";
+import { FaPlus, FaTrashAlt, FaCheckCircle } from "react-icons/fa";
+import { UserAuth } from "../../context/AuthContext";
+import {
+  fetchTasks,
+  deleteTask,
+  markComplete,
+  createTask,
+} from "../../utils/taskService"; // <-- updated path
+import AddNewTaskModal from "./AddNewTaskModal"; // <-- same folder as this page
 
 const Playground = () => {
-  const [spacesData, setSpacesData] = useState(initialSpaces);
+  const [tasksData, setTasksData] = useState([]);
   const [activeLabel, setActiveLabel] = useState(null);
-  const [sortMode, setSortMode] = useState("default");
+  const [sortMode, setSortMode] = useState("default"); // default | stack | deadline
 
-  const handleDelete = (id) => {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this space?"
-    );
-    if (confirmed) {
-      setSpacesData((prev) => prev.filter((space) => space.id !== id));
+  const { session } = UserAuth();
+  const userId = session?.user?.id;
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [, setTick] = useState(0); // force re-render for live progress
+
+  // Live update progress every 60s
+  useEffect(() => {
+    const id = setInterval(() => setTick((t) => t + 1), 60000);
+    return () => clearInterval(id);
+  }, []);
+
+  // Load tasks
+  useEffect(() => {
+    if (!userId) return;
+    (async () => {
+      try {
+        setLoading(true);
+        const data = await fetchTasks(userId);
+        setTasksData(data);
+      } catch (e) {
+        setError(e.message || "Failed to load tasks");
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [userId]);
+
+  // Create from modal
+  const handleCreate = async (payload) => {
+    try {
+      await createTask(userId, payload);
+      const data = await fetchTasks(userId);
+      setTasksData(data);
+    } catch (e) {
+      setError(e.message || "Failed to create task");
     }
   };
 
-  // Get unique labels
-  const uniqueLabels = [
-    ...new Set(spacesData.flatMap((space) => space.labels || [])),
-  ];
+  // One handler for both actions
+  const handleTaskAction = async (action, id) => {
+    // Keep a copy for rollback
+    const prev = tasksData;
 
-  // Filter + Sort logic
-  let filteredSpaces = [...spacesData];
+    if (action === "delete") {
+      const confirmed = window.confirm("Delete this task?");
+      if (!confirmed) return;
 
-  if (activeLabel) {
-    filteredSpaces = filteredSpaces.filter((space) =>
-      (space.labels || []).includes(activeLabel)
-    );
-  }
+      // Optimistic remove
+      setTasksData((curr) => curr.filter((t) => t.id !== id));
+      try {
+        await deleteTask(id);
+      } catch (e) {
+        setTasksData(prev); // rollback
+        setError(e.message || "Failed to delete task");
+      }
+      return;
+    }
 
-  if (sortMode === "stack") {
-    filteredSpaces.sort(
-      (a, b) => new Date(b.startDate) - new Date(a.startDate)
-    );
-  } else if (sortMode === "deadline") {
-    filteredSpaces.sort((a, b) => new Date(a.endDate) - new Date(b.endDate));
-  }
+    if (action === "complete") {
+      // Optimistic: hide immediately (since completed tasks are hidden)
+      setTasksData((curr) => curr.filter((t) => t.id !== id));
+      try {
+        await markComplete(id); // or completeTask(id) if that's your function name
+      } catch (e) {
+        setTasksData(prev); // rollback
+        setError(e.message || "Failed to mark completed");
+      }
+    }
+  };
+  // Time-based progress helper
+  const timeProgress = (startISO, endISO) => {
+    const now = Date.now();
+    const s = new Date(startISO || 0).getTime();
+    const e = new Date(endISO || 0).getTime();
+    if (!s || !e || e <= s) return { percent: 0, state: "Scheduled" };
+    if (now <= s) return { percent: 0, state: "Scheduled" };
+    if (now >= e) return { percent: 100, state: "Completed" };
+    const percent = Math.round(((now - s) / (e - s)) * 100);
+    return { percent, state: "In Progress" };
+  };
+
+  // Unique labels
+  const uniqueLabels = useMemo(
+    () => Array.from(new Set(tasksData.flatMap((t) => t.labels || []))),
+    [tasksData]
+  );
+
+  // Filter + sort
+  const filteredtasks = useMemo(() => {
+    let list = [...tasksData];
+    if (activeLabel) {
+      list = list.filter((t) => (t.labels || []).includes(activeLabel));
+    }
+    if (sortMode === "stack") {
+      list.sort(
+        (a, b) =>
+          new Date(b.start_date || b.created_at || 0) -
+          new Date(a.start_date || a.created_at || 0)
+      );
+    } else if (sortMode === "deadline") {
+      list.sort(
+        (a, b) =>
+          new Date(a.end_date || "2100-01-01") -
+          new Date(b.end_date || "2100-01-01")
+      );
+    }
+    return list;
+  }, [tasksData, activeLabel, sortMode]);
 
   return (
     <div className="max-w-screen-xl mx-auto px-4 pt-28 pb-10">
@@ -115,19 +135,26 @@ const Playground = () => {
             Playground
           </h1>
           <p className="text-gray-600 dark:text-gray-300 text-sm">
-            Create and manage your TaskDesk spaces.
+            Create and manage your TaskDesk tasks.
           </p>
         </div>
 
-        <button className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-700 text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+        <button
+          onClick={() => setOpen(true)}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-700 text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+        >
           <FaPlus className="text-sm" />
-          New Space
+          New task
         </button>
+        <AddNewTaskModal
+          open={open}
+          onClose={() => setOpen(false)}
+          onCreate={handleCreate}
+        />
       </div>
 
       {/* Filters */}
       <div className="flex flex-wrap gap-2 mb-6">
-        {/* All Button */}
         <button
           onClick={() => {
             setActiveLabel(null);
@@ -142,7 +169,6 @@ const Playground = () => {
           All
         </button>
 
-        {/* Label Buttons */}
         {uniqueLabels.map((label) => (
           <button
             key={label}
@@ -160,7 +186,6 @@ const Playground = () => {
           </button>
         ))}
 
-        {/* Stack Sort */}
         <button
           onClick={() => {
             setSortMode("stack");
@@ -175,7 +200,6 @@ const Playground = () => {
           Stack
         </button>
 
-        {/* Deadline Sort */}
         <button
           onClick={() => {
             setSortMode("deadline");
@@ -191,94 +215,126 @@ const Playground = () => {
         </button>
       </div>
 
-      {/* Cards Grid */}
-      {filteredSpaces.length === 0 ? (
+      {/* Start from here and erase the top mechanism  */}
+      {/* Errors */}
+      {error && (
+        <p className="mb-4 text-center text-sm font-medium text-red-700 bg-red-100 border border-red-300 rounded-md px-4 py-3 shadow-sm">
+          {error}
+        </p>
+      )}
+
+      {/* Cards */}
+      {loading ? (
+        <div className="text-center text-gray-600 py-16">Loading tasks…</div>
+      ) : filteredtasks.length === 0 ? (
         <div className="text-center py-16 border-2 border-dashed rounded-xl border-gray-200 dark:border-gray-700">
           <p className="text-gray-700 dark:text-gray-200 font-medium">
-            No spaces found.
+            No tasks found.
           </p>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            Try changing the filter or create a new space.
+            Try changing the filter or sort.
           </p>
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {filteredSpaces.map((space) => (
-            <div
-              key={space.id}
-              className="relative rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:shadow-md transition dark:bg-gray-900 dark:border-gray-700"
-            >
-              <button
-                onClick={() => handleDelete(space.id)}
-                className="absolute top-3 right-3 text-gray-400 hover:text-red-500 transition"
-                title="Delete Space"
+          {filteredtasks.map((task) => {
+            const { percent, state } = timeProgress(
+              task.start_date,
+              task.end_date
+            );
+
+            return (
+              <div
+                key={task.id}
+                className="relative rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:shadow-md transition dark:bg-gray-900 dark:border-gray-700"
               >
-                <FaTrashAlt />
-              </button>
+                {/* Actions */}
+                <div className="absolute top-3 right-3 flex gap-2">
+                  <button
+                    onClick={() => handleTaskAction("complete", task.id)}
+                    className="text-gray-400 hover:text-green-500 transition"
+                    title="Mark as Completed"
+                  >
+                    <FaCheckCircle />
+                  </button>
+                  <button
+                    onClick={() => handleTaskAction("delete", task.id)}
+                    className="text-gray-400 hover:text-red-500 transition"
+                    title="Delete task"
+                  >
+                    <FaTrashAlt />
+                  </button>
+                </div>
 
-              <div className="flex items-start justify-between">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  {space.title}
+                  {task.title}
                 </h3>
+                <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+                  {task.description}
+                </p>
+
+                {(task.labels || []).length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {task.labels.map((label, i) => (
+                      <span
+                        key={i}
+                        className="text-[10px] font-semibold px-2 py-1 rounded bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-100"
+                      >
+                        {label}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {task.priority && (
+                  <span
+                    className={`inline-block mt-2 px-2 py-1 text-xs font-medium rounded-full ${
+                      task.priority === "Priority & Important"
+                        ? "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200"
+                        : task.priority === "Not Priority & Important"
+                        ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200"
+                        : task.priority === "Priority & Not Important"
+                        ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-800 dark:text-yellow-100"
+                        : "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
+                    }`}
+                  >
+                    {task.priority}
+                  </span>
+                )}
+
+                <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                  <div>
+                    <strong>Start:</strong>{" "}
+                    {task.start_date
+                      ? new Date(task.start_date).toLocaleString()
+                      : "-"}
+                  </div>
+                  <div>
+                    <strong>End:</strong>{" "}
+                    {task.end_date
+                      ? new Date(task.end_date).toLocaleString()
+                      : "-"}
+                  </div>
+                </div>
+
+                {/* Time-based Progress */}
+                <div className="mt-3">
+                  <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-1">
+                    <span>{state}</span>
+                    <span>{percent}%</span>
+                  </div>
+                  <div className="w-full h-2 bg-gray-200 rounded overflow-hidden dark:bg-gray-700">
+                    <div
+                      className={`h-full ${
+                        state === "Completed" ? "bg-green-600" : "bg-green-500"
+                      }`}
+                      style={{ width: `${percent}%` }}
+                    />
+                  </div>
+                </div>
               </div>
-
-              <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-                {space.description}
-              </p>
-
-              {space.labels && (
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {space.labels.map((label, i) => (
-                    <span
-                      key={i}
-                      className="text-[10px] font-semibold px-2 py-1 rounded bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-100"
-                    >
-                      {label}
-                    </span>
-                  ))}
-                </div>
-              )}
-
-              {space.priority && (
-                <span
-                  className={`inline-block mt-2 px-2 py-1 text-xs font-medium rounded-full ${
-                    space.priority === "Priority & Important"
-                      ? "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200"
-                      : space.priority === "Not Priority & Important"
-                      ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200"
-                      : space.priority === "Priority & Not Important"
-                      ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-800 dark:text-yellow-100"
-                      : "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
-                  }`}
-                >
-                  {space.priority}
-                </span>
-              )}
-
-              <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                <div>
-                  <strong>Start:</strong>{" "}
-                  {new Date(space.startDate).toLocaleString()}
-                </div>
-                <div>
-                  <strong>End:</strong>{" "}
-                  {new Date(space.endDate).toLocaleString()}
-                </div>
-              </div>
-
-              <div className="mt-3">
-                <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                  Progress: {space.progress || 0}%
-                </div>
-                <div className="w-full h-2 bg-gray-200 rounded overflow-hidden dark:bg-gray-700">
-                  <div
-                    className="h-full bg-green-500 transition-all"
-                    style={{ width: `${space.progress || 0}%` }}
-                  />
-                </div>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
@@ -286,4 +342,3 @@ const Playground = () => {
 };
 
 export default Playground;
-

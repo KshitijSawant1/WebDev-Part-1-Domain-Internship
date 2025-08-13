@@ -19,6 +19,9 @@ const Playground = () => {
   const [activeLabel, setActiveLabel] = useState(null);
   const [sortMode, setSortMode] = useState("default");
 
+  {
+    /*Remove This and start fresh */
+  }
   const handleDelete = (id) => {
     const confirmed = window.confirm(
       "Are you sure you want to delete this Task ?"
