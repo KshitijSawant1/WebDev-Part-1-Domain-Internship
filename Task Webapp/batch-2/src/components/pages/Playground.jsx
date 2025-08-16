@@ -1,49 +1,105 @@
-import React, { useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { FaPlus, FaTrashAlt } from "react-icons/fa";
+import AddNewTaskModal from "./AddNewTaskModal";
+import { UserAuth } from "../../context/AuthContext";
+import {
+  fetchTasks,
+  createTask,
+  deleteTask,
+  markComplete,
+} from "../../utils/taskService";
 
-const initialTasks = [
-  {
-    id: 1,
-    title: "My Notes",
-    type: "Private",
-    description: "Personal Todos",
-    labels: ["Frontend", "Urgent"],
-    Priority: "Priority & Important",
-    startDate: "2025-08-01T10:00",
-    endDate: "2025-09-01T12:00",
-    Progress: 80,
-  },
-];
 const Playground = () => {
-  const [taskData, setTaskData] = useState(initialTasks);
+  const { session } = UserAuth();
+  const userId = session?.user?.id;
+  const [taskData, setTaskData] = useState([]);
   const [activeLabel, setActiveLabel] = useState(null);
   const [sortMode, setSortMode] = useState("default");
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const handleDelete = (id) => {
-    const confirmed = window.confirm(
-      "Are You Sure You want to Delete this Task ?"
-    );
-    if (confirmed) {
-      setTaskData((prev) => prev.filter((task) => task.id == id));
+  //Load the Task for DB
+  useEffect(() => {
+    if (!userId) return;
+    (async () => {
+      try {
+        setLoading(true);
+        const data = await fetchTasks(userId);
+        setTaskData(data);
+      } catch (e) {
+        setError(e.message || "Failed to Load the Task");
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [userId]);
+
+  //create form Modal
+  const handleCreate = async (payload) => {
+    try {
+      await createTask(userId, payload);
+      const data = await fetchTasks(userId);
+      setTaskData(data);
+    } catch (e) {
+      setError(e.message || "Failed to Create the Task");
     }
   };
 
-  const uniqueLabels = [
-    ...new Set(taskData.flatMap((task) => task.labels) || []),
-  ];
+  // One Handler for Two functions
+  const handleTaskAction = async (action, id) => {
+    // Keep a Copy For Rollback
+    const prev = taskData;
+    if (action === "delete") {
+      const confirmed = window.confirm("Delete this task");
+      if (!confirmed) return;
+      setTaskData((curr) => curr.filter((t) => t.id !== id));
+      try {
+        await deleteTask(id);
+      } catch (e) {
+        setTaskData(prev);
+        setError(e.message || "Failed To Delete Task");
+      }
+      return;
+    }
+    if (action === "complete") {
+      setTaskData((curr) => curr.filter((t) => t.id !== id));
+      try {
+        await markComplete(id);
+      } catch (e) {
+        setTaskData(prev);
+        setError(e.message || "Failed To Mark Task Complete");
+      }
+    }
+  };
 
-  let filteredTasks = [...taskData];
-  if (activeLabel) {
-    filteredTasks = filteredTasks.filter((task) =>
-      (task.labels || []).includes(activeLabel)
-    );
-  }
+  const uniqueLabels = useMemo(
+    () => Array.from(new Set(taskData.flatMap((t) => t.label || []))),
+    [taskData]
+  );
 
-  if (sortMode === "stack") {
-    filteredTasks.sort((a, b) => new Data(b.startDate) - new Data(a.startDate));
-  } else if (sortMode === "deadline") {
-    filteredTasks.sort((a, b) => new Data(a.endDate) - new Data(b.endDate));
-  }
+  // Filter + Sort
+  const filteredtasks = useMemo(() => {
+    let list = [...taskData];
+    if (activeLabel) {
+      list = list.filter((t) => (t.label || []).includes(activeLabel));
+    }
+    if (sortMode === "stack") {
+      list.sort(
+        (a, b) =>
+          new Date(b.start_date || b.created_at || 0) -
+          new Date(a.start_date || a.created_at || 0)
+      );
+    } else if (sortMode === "deadline") {
+      list.sort(
+        (a, b) =>
+          new Date(a.end_date || "2100-01-01") -
+          new Date(b.end_date || "2100-01-01")
+      );
+    }
+    return list;
+  }, [taskData, activeLabel, sortMode]);
+
   return (
     <div className="max-h-screen-xl mx-auto px-4 pt-28 pb-10">
       <div className=" flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
@@ -57,6 +113,7 @@ const Playground = () => {
         </div>
 
         <button
+          onClick={() => setOpen(true)}
           className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-700
         text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 
         dark:bg-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
@@ -64,6 +121,11 @@ const Playground = () => {
           <FaPlus className="text-sm" />
           New Task
         </button>
+        <AddNewTaskModal
+          open={open}
+          onClose={() => setOpen(false)}
+          onCreate={handleCreate}
+        />
       </div>
       <div className="flex flex-wrap gap-2 mb-6">
         {/*All buttons */}

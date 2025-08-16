@@ -43,26 +43,26 @@ const Navbar = () => {
               />
             </svg>
           </button>
-          <div
-            className={`w-full md:w-auto md:order-1 md:flex md:items-center ${
-              open ? "block" : "hidden"
-            }`}
-          >
-            <ul className="flex flex-cols md:flex-row md:space-x-8 mt-4 md:mt-0 font-medium">
-              {["signin", "signup", "dashboard"].map((item) => (
-                <li key={item}>
-                  <Link
-                    to={`/${item}`}
-                    onClick={() => setOpen(false)}
-                    className="block px-3 py-2 rounded hover:text-blue-700 
+        </div>
+        <div
+          className={`w-full md:w-auto md:order-1 md:flex md:items-center ${
+            open ? "block" : "hidden"
+          }`}
+        >
+          <ul className="flex flex-cols md:flex-row md:space-x-8 mt-4 md:mt-0 font-medium">
+            {["signin", "signup", "dashboard"].map((item) => (
+              <li key={item}>
+                <Link
+                  to={`/${item}`}
+                  onClick={() => setOpen(false)}
+                  className="block px-3 py-2 rounded hover:text-blue-700 
                   text-gray-900 dark:text-white dark:hover:text-blue-500"
-                  >
-                    {item.charAt(0).toUpperCase()+item.slice(1)}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+                >
+                  {item.charAt(0).toUpperCase() + item.slice(1)}
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </nav>

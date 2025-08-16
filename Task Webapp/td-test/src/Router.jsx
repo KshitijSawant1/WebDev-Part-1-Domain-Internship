@@ -3,7 +3,8 @@ import Layout from "./components/Layout";
 import Hero from "./components/hero/Hero";
 import Signup from "./components/register/Signup";
 import Signin from "./components/register/Signin";
-import Dashboard from "./components/pages/Dashboard";
+import XDashboard from "./components/pages/XDashboard";
+import SDashboard from "./components/pages/SDashboard";
 import PageNotFound from "./components/pages/PageNotFound";
 import Playground from "./components/pages/Playground";
 
@@ -15,7 +16,8 @@ export const router = createBrowserRouter([
       { index: true, element: <Hero /> },
       { path: "signup", element: <Signup /> },
       { path: "signin", element: <Signin /> },
-      { path: "dashboard", element: <Dashboard /> },
+      { path: "xdashboard", element: <XDashboard /> },
+      { path: "sdashboard", element: <SDashboard /> },
       { path: "playground", element: <Playground /> },
       { path: "*", element: <PageNotFound /> },
     ],

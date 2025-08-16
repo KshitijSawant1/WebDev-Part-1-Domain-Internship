@@ -20,13 +20,6 @@ const Playground = () => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [, setTick] = useState(0); // force re-render for live progress
-
-  // Live update progress every 60s
-  useEffect(() => {
-    const id = setInterval(() => setTick((t) => t + 1), 60000);
-    return () => clearInterval(id);
-  }, []);
 
   // Load tasks
   useEffect(() => {
@@ -85,17 +78,6 @@ const Playground = () => {
         setError(e.message || "Failed to mark completed");
       }
     }
-  };
-  // Time-based progress helper
-  const timeProgress = (startISO, endISO) => {
-    const now = Date.now();
-    const s = new Date(startISO || 0).getTime();
-    const e = new Date(endISO || 0).getTime();
-    if (!s || !e || e <= s) return { percent: 0, state: "Scheduled" };
-    if (now <= s) return { percent: 0, state: "Scheduled" };
-    if (now >= e) return { percent: 100, state: "Completed" };
-    const percent = Math.round(((now - s) / (e - s)) * 100);
-    return { percent, state: "In Progress" };
   };
 
   // Unique labels
@@ -223,7 +205,7 @@ const Playground = () => {
         </p>
       )}
 
-      {/* Cards */}
+      {/* Task */}
       {loading ? (
         <div className="text-center text-gray-600 py-16">Loading tasks…</div>
       ) : filteredtasks.length === 0 ? (
@@ -237,106 +219,84 @@ const Playground = () => {
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {filteredtasks.map((task) => {
-            const { percent, state } = timeProgress(
-              task.start_date,
-              task.end_date
-            );
+          {filteredtasks.map((task) => (
+            <div
+              key={task.id}
+              className="relative rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:shadow-md transition dark:bg-gray-900 dark:border-gray-700"
+            >
+              {/* Actions */}
+              <div className="absolute top-3 right-3 flex gap-2">
+                <button
+                  onClick={() => handleTaskAction("complete", task.id)}
+                  className="text-gray-400 hover:text-green-500 transition"
+                  title="Mark as Completed"
+                >
+                  <FaCheckCircle />
+                </button>
+                <button
+                  onClick={() => handleTaskAction("delete", task.id)}
+                  className="text-gray-400 hover:text-red-500 transition"
+                  title="Delete task"
+                >
+                  <FaTrashAlt />
+                </button>
+              </div>
 
-            return (
-              <div
-                key={task.id}
-                className="relative rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:shadow-md transition dark:bg-gray-900 dark:border-gray-700"
-              >
-                {/* Actions */}
-                <div className="absolute top-3 right-3 flex gap-2">
-                  <button
-                    onClick={() => handleTaskAction("complete", task.id)}
-                    className="text-gray-400 hover:text-green-500 transition"
-                    title="Mark as Completed"
-                  >
-                    <FaCheckCircle />
-                  </button>
-                  <button
-                    onClick={() => handleTaskAction("delete", task.id)}
-                    className="text-gray-400 hover:text-red-500 transition"
-                    title="Delete task"
-                  >
-                    <FaTrashAlt />
-                  </button>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                {task.title}
+              </h3>
+              <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+                {task.description}
+              </p>
+
+              {(task.labels || []).length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {task.labels.map((label, i) => (
+                    <span
+                      key={i}
+                      className="text-[10px] font-semibold px-2 py-1 rounded bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-100"
+                    >
+                      {label}
+                    </span>
+                  ))}
                 </div>
+              )}
 
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  {task.title}
-                </h3>
-                <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-                  {task.description}
-                </p>
+              {task.priority && (
+                <span
+                  className={`inline-block mt-2 px-2 py-1 text-xs font-medium rounded-full ${
+                    task.priority === "Priority & Important"
+                      ? "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200"
+                      : task.priority === "Not Priority & Important"
+                      ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200"
+                      : task.priority === "Priority & Not Important"
+                      ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-800 dark:text-yellow-100"
+                      : "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
+                  }`}
+                >
+                  {task.priority}
+                </span>
+              )}
 
-                {(task.labels || []).length > 0 && (
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {task.labels.map((label, i) => (
-                      <span
-                        key={i}
-                        className="text-[10px] font-semibold px-2 py-1 rounded bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-100"
-                      >
-                        {label}
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-                {task.priority && (
-                  <span
-                    className={`inline-block mt-2 px-2 py-1 text-xs font-medium rounded-full ${
-                      task.priority === "Priority & Important"
-                        ? "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200"
-                        : task.priority === "Not Priority & Important"
-                        ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200"
-                        : task.priority === "Priority & Not Important"
-                        ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-800 dark:text-yellow-100"
-                        : "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
-                    }`}
-                  >
-                    {task.priority}
-                  </span>
-                )}
-
-                <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                  <div>
-                    <strong>Start:</strong>{" "}
-                    {task.start_date
-                      ? new Date(task.start_date).toLocaleString()
-                      : "-"}
-                  </div>
-                  <div>
-                    <strong>End:</strong>{" "}
-                    {task.end_date
-                      ? new Date(task.end_date).toLocaleString()
-                      : "-"}
-                  </div>
+              <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                <div>
+                  <strong>Start:</strong>{" "}
+                  {task.start_date
+                    ? new Date(task.start_date).toLocaleString()
+                    : "-"}
                 </div>
-
-                {/* Time-based Progress */}
-                <div className="mt-3">
-                  <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-1">
-                    <span>{state}</span>
-                    <span>{percent}%</span>
-                  </div>
-                  <div className="w-full h-2 bg-gray-200 rounded overflow-hidden dark:bg-gray-700">
-                    <div
-                      className={`h-full ${
-                        state === "Completed" ? "bg-green-600" : "bg-green-500"
-                      }`}
-                      style={{ width: `${percent}%` }}
-                    />
-                  </div>
+                <div>
+                  <strong>End:</strong>{" "}
+                  {task.end_date
+                    ? new Date(task.end_date).toLocaleString()
+                    : "-"}
                 </div>
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
       )}
+      
     </div>
   );
 };
