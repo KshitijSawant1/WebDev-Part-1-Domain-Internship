@@ -2,6 +2,7 @@
 # WebDev-Part-1-Domain-Internship
 
 This repository documents the complete learning journey and project work done under the **Web Development Part-1 Domain Internship** program. It is a structured archive of hands-on coding sessions, real-world problem solving, and practical web app development using modern frontend technologies.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ---
 
