@@ -7,9 +7,10 @@ This repository documents the complete learning journey and project work done un
 
 ## 🧭 TaskDesk – Visual Task Graph WebApp
 
-**Live Demo**: [https://taskdesk-ks.netlify.app/task-graph](https://taskdesk-ks.netlify.app/task-graph)
+**Live Demo**: [Click To Experience](https://taskdesk-ks.netlify.app/)
 
-<img width="1920" height="1080" alt="Image" src="https://github.com/user-attachments/assets/b85396ae-450d-45b3-adf1-a35155451293" />
+<img src="https://github.com/user-attachments/assets/b85396ae-450d-45b3-adf1-a35155451293" alt="TaskGraph Preview" width="100%" style="border: 2px solid #ccc; border-radius: 8px;" />
+
 
 **TaskDesk** is a mind-map-style task management web application that visualizes tasks based on priority and importance. It merges data organization with intuitive interaction, helping users see the "big picture" of their tasks through a clean, interactive graph.
 
