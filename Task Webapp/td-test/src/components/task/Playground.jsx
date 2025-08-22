@@ -7,13 +7,15 @@ import {
   deleteTask,
   markComplete,
   createTask,
-} from "../../utils/taskService"; // <-- updated path
-import AddNewTaskModal from "./AddNewTaskModal"; // <-- same folder as this page
+} from "../../utils/taskService";
+import AddNewTaskModal from "./AddNewTaskModal";
+import { TbPercentage30 } from "react-icons/tb";
 
 const Playground = () => {
   const [tasksData, setTasksData] = useState([]);
   const [activeLabel, setActiveLabel] = useState(null);
-  const [sortMode, setSortMode] = useState("default"); // default | stack | deadline
+  const [sortMode, setSortMode] = useState("default");
+  const [showProgress, setShowProgress] = useState(true);
 
   const { session } = UserAuth();
   const userId = session?.user?.id;
@@ -107,6 +109,138 @@ const Playground = () => {
     }
     return list;
   }, [tasksData, activeLabel, sortMode]);
+  // Returns progress info for a task based on start/end times
+  function getProgressInfo(startISO, endISO, now = new Date()) {
+    if (!startISO || !endISO) {
+      return {
+        phase: "unknown",
+        pct: 0,
+        className: "bg-gray-300",
+        label: "No schedule",
+      };
+    }
+
+    const start = new Date(startISO);
+    const end = new Date(endISO);
+    const durationMs = Math.max(0, end - start); // handle weird data
+    const graceEnd = new Date(end.getTime() + durationMs); // end + duration
+
+    // Before start
+    if (now < start) {
+      const untilStart = start - now;
+      return {
+        phase: "pre",
+        pct: 0,
+        className: "bg-gray-300",
+        label: `Starts in ${formatDelta(untilStart)}`,
+      };
+    }
+
+    // Between start and end → GREEN depleting
+    if (now >= start && now <= end) {
+      const elapsed = now - start;
+      const pctElapsed = durationMs ? elapsed / durationMs : 1;
+      const pctRemaining = Math.max(0, 1 - pctElapsed); // “depleting”
+      return {
+        phase: "active",
+        pct: pctRemaining, // we show remaining green
+        className: "bg-emerald-500",
+        label: `${formatDelta(end - now)} left`,
+      };
+    }
+
+    // Between end and end+duration → YELLOW rising
+    if (now > end && now <= graceEnd) {
+      const over = now - end;
+      const pct = durationMs ? Math.min(1, over / durationMs) : 1;
+      return {
+        phase: "grace",
+        pct, // rising
+        className: "bg-amber-500",
+        label: `Overdue by ${formatDelta(over)}`,
+      };
+    }
+
+    // After grace → RED full
+    const overdue = now - graceEnd;
+    return {
+      phase: "late",
+      pct: 1,
+      className: "bg-rose-600",
+      label: `Overdue by ${formatDelta(overdue)} (past grace)`,
+    };
+  }
+
+  // Nicely format a delta in ms as h m (e.g., "1h 12m")
+  function formatDelta(ms) {
+    const totalM = Math.max(0, Math.round(ms / 60000));
+    const h = Math.floor(totalM / 60);
+    const m = totalM % 60;
+    if (h > 0 && m > 0) return `${h}h ${m}m`;
+    if (h > 0) return `${h}h`;
+    return `${m}m`;
+  }
+
+  function getProgressInfo(startISO, endISO, now = new Date()) {
+    if (!startISO || !endISO) {
+      return {
+        phase: "none",
+        pct: 0,
+        color: "bg-gray-300",
+        label: "No schedule",
+      };
+    }
+
+    const start = new Date(startISO);
+    const end = new Date(endISO);
+    const dur = Math.max(0, end - start);
+    const graceEnd = new Date(end.getTime() + dur);
+
+    if (now < start) {
+      return {
+        phase: "pre",
+        pct: 0,
+        color: "bg-gray-300",
+        label: `Starts in ${formatDelta(start - now)}`,
+      };
+    }
+
+    if (now <= end) {
+      // GREEN — show remaining (depleting)
+      const pctRemaining = dur ? Math.max(0, 1 - (now - start) / dur) : 0;
+      return {
+        phase: "active",
+        pct: pctRemaining,
+        color: "bg-emerald-500",
+        label: `${formatDelta(end - now)} left`,
+      };
+    }
+
+    if (now <= graceEnd) {
+      // YELLOW — rises during grace (same length as duration)
+      const pct = dur ? Math.min(1, (now - end) / dur) : 1;
+      return {
+        phase: "grace",
+        pct,
+        color: "bg-amber-500",
+        label: `Overdue ${formatDelta(now - end)}`,
+      };
+    }
+
+    // RED — full after grace
+    return {
+      phase: "late",
+      pct: 1,
+      color: "bg-rose-600",
+      label: `Overdue ${formatDelta(now - graceEnd)} (past grace)`,
+    };
+  }
+
+  const [now, setNow] = useState(new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 30000); // update every 30s
+    return () => clearInterval(id);
+  }, []);
 
   return (
     <div className="max-w-screen-xl mx-auto px-4 pt-28 pb-10">
@@ -123,11 +257,15 @@ const Playground = () => {
 
         <button
           onClick={() => setOpen(true)}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-700 text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+          className="fixed bottom-6 right-6 z-50 flex items-center justify-center w-14 h-14 rounded-full shadow-lg
+             bg-blue-700 text-white focus:outline-none focus:ring-4 focus:ring-blue-300
+             dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800
+             transform transition-transform duration-200
+             hover:scale-110 active:scale-90"
         >
-          <FaPlus className="text-sm" />
-          New task
+          <FaPlus className="text-xl transition-transform duration-200 hover:rotate-90" />
         </button>
+
         <AddNewTaskModal
           open={open}
           onClose={() => setOpen(false)}
@@ -137,6 +275,17 @@ const Playground = () => {
 
       {/* Filters */}
       <div className="flex flex-wrap gap-2 mb-6">
+        <button
+          onClick={() => setShowProgress((v) => !v)}
+          title={showProgress ? "Hide progress bar" : "Show progress bar"}
+          className="flex items-center gap-2 px-3 py-1.5 text-sm rounded-md border 
+             text-gray-700 border-gray-200 hover:bg-gray-50 
+             dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800"
+        >
+          {showProgress ? "Hide" : "Show"}
+          <TbPercentage30 className="w-4 h-4" />
+        </button>
+
         <button
           onClick={() => {
             setActiveLabel(null);
@@ -292,11 +441,42 @@ const Playground = () => {
                     : "-"}
                 </div>
               </div>
+              {showProgress &&
+                (() => {
+                  const { pct, color, label, phase } = getProgressInfo(
+                    task.start_date,
+                    task.end_date,
+                    now
+                  );
+                  const width = `${Math.round(
+                    Math.min(100, Math.max(0, pct * 100))
+                  )}%`;
+
+                  return (
+                    <div className="mt-3">
+                      <div className="h-2 w-full rounded-full bg-gray-200/70 overflow-hidden">
+                        <div
+                          className={`${color} h-full transition-[width] duration-700 ease-out`}
+                          style={{ width }}
+                        />
+                      </div>
+                      <div className="mt-1 text-xs text-gray-500 flex justify-between">
+                        <span>
+                          {phase === "pre" && "Not started"}
+                          {phase === "active" && "In progress"}
+                          {phase === "grace" && "Grace window"}
+                          {phase === "late" && "Late"}
+                          {phase === "none" && "—"}
+                        </span>
+                        <span>{label}</span>
+                      </div>
+                    </div>
+                  );
+                })()}
             </div>
           ))}
         </div>
       )}
-      
     </div>
   );
 };

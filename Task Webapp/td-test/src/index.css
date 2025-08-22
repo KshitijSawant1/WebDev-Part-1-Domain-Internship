@@ -1,4 +1,70 @@
 @import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 @plugin "flowbite/plugin";
 @source "../node_modules/flowbite";
 @import "flowbite/src/themes/default";
+
+@keyframes fadeInScale {
+  0% {
+    opacity: 0;
+    transform: scale(0.7) rotate(-10deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+.animate-fadeInScale {
+  animation: fadeInScale 0.3s ease-out;
+}
+
+@keyframes waveLayerA {
+  0% {
+    background-position: 50% 50%;
+  }
+  50% {
+    background-position: 0% 60%;
+  }
+  100% {
+    background-position: 50% 50%;
+  }
+}
+@keyframes waveLayerB {
+  0% {
+    background-position: 50% 50%;
+  }
+  50% {
+    background-position: 100% 40%;
+  }
+  100% {
+    background-position: 50% 50%;
+  }
+}
+/* motion safety */
+@media (prefers-reduced-motion: reduce) {
+  .absolute[inset="0"] {
+    animation: none !important;
+  }
+}
+/* Wave layer helpers */
+.waveA {
+  background-size: 250% 250%;
+  animation: waveLayerA var(--wave-speed-a, 22s) ease-in-out infinite;
+}
+.waveB {
+  background-size: 220% 220%;
+  animation: waveLayerB var(--wave-speed-b, 28s) ease-in-out infinite;
+  mix-blend-mode: multiply;
+}
+.waveVignette {
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .waveA,
+  .waveB {
+    animation: none !important;
+  }
+}

@@ -1,0 +1,6 @@
+.orb-container {
+  position: absolute;
+  inset: 0;
+  /* soft blur glow */
+  filter: blur(0.2px);
+}
